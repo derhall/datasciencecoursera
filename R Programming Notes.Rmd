@@ -1,0 +1,76 @@
+---
+title: "R Programming Notes"
+author: "Derek Hall"
+date: "17/02/2020"
+output: pdf_document
+---
+
+# Week 1
+
+## Subsetting
+
+There are three subsetting commands: "[", "]]", and "$". 
+
+- "[" always returns an object of the same class and allows you to subset multiple elements from an object.  
+
+- "[[" extracts elements from a list or data.frame.  
+
+- "$" extracts elements from a list or data.frame by name specifically.  
+
+
+**Note:** "[[" can be used to extract with a *computed* indicies, whereas "$" can only subset by name. 
+
+```{r}
+x <- list(foo = 1:4, bar = 0.6, baz = "hello")
+
+name <- "foo"
+
+x[[name]]
+
+x$name
+
+x$foo
+```
+
+
+**Note** Subsetting a matrix  with "[" default behavor returns a vector of the subset (dimensions are lost). To prevent this behavior, set "drop = false". 
+  
+```{r}
+x <- matrix (1:6, 2, 3)
+x[1,]
+x[1, , drop = F]
+```
+  
+### Removing NA values
+
+One of the most common tasks is removing null/NA values. The general workflow is to create a new vector or matrix that defines the location of the NA values, and then subset the original matrix based on this index. 
+
+e.g.
+
+```{r}
+x <- c(1, 2, NA, 4, NA, 5)
+bad <- is.na(x)
+x[!bad]
+
+```
+
+**Note** the "!" or bang symbol can be used to indicates inversion. 
+
+Sometimes you need to subset multiple things (e.g. need values for both the control and the treatment group). This can be done with the *complete.cases* function. 
+
+```{r}
+x <- c(1, 2, NA, 4, NA, 5)
+y <- c("a", NA, "c", "d", "e", "f")
+good <- complete.cases(x, y)
+x[good]
+y[good]
+```
+
+*complete.cases* can also be used on data.frames
+
+```{r}
+airquality[1:6, ]
+good <- complete.cases(airquality)
+airquality[good, ][1:6, ]
+```
+
