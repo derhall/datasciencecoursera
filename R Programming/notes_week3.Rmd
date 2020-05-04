@@ -1,0 +1,304 @@
+---
+title: "R Programming Week 3 Notes"
+author: "Derek Hall"
+date: "3/25/2020"
+output: html_document
+---
+
+# Looping Commands
+
+- *lapply*: loop over a list and evaluate a f(x) on each element  
+- *sapply*: lapply but with simplified results  
+- *apply*: apply a function over the margins of an array  
+- *tapply*: apply a function over subsets of a vector
+- *mapply*: multivariate version of lapply  
+- *split*: auxilary function useful in conjection with *lapply*.
+
+## lapply
+
+Always returns a list. If the input is not a list, it will be coerced into list form (with *as.list*)
+
+*e.g.*
+
+```{r} 
+x <- list(a = 1:5, b = rnorm(10))
+
+lapply(x, mean)
+
+```
+
+```{r}
+x <- 1:4
+
+lapply(x, runif)
+
+lapply(x, runif, min = 0, max = 10)
+```
+
+*lapply* (and the other apply functions) make heavy use of anonymous functions. Anonymous functions are functions that don't have names and are not assigned in the environment. 
+
+```{r}
+x <- list(a = matrix(1:4, 2, 2), b = matrix(1:6, 3, 2))
+x
+
+lapply(x, function(elt) elt[, 1])
+```
+
+## sapply
+
+Will try to simplify the result of *lapply* if possible. 
+
+- If the result is a list where every element is length 1, then a vector is returned  
+- If the result is a list where every element is a vector of the same length (>1), a matrix is returned
+- If it can't figure it out, a list is returned 
+
+## apply
+
+Evaluates a function (often an anonymous one) over the margins of an array. 
+
+*Note:* apply is not faster than writing a for loop, it is just less typing. 
+
+*margins*: chooses which dimension to take for the function. *e.g.* for a matrix, rows are dim 1 and col. are dim 2. 
+
+```{r}
+x <- matrix(rnorm(200), 20, 10)
+
+apply(x, 2, mean) #the mean of the columns
+
+apply(x, 1, sum) #the sum of the rows
+```
+
+rowSums, rowMeans, colSums, and colMeans are equivalent to simple apply functions, but are much faster if the matrix is large. 
+
+apply can also be used on multidimensional matrices 
+
+```{r}
+a <- array(rnorm(2 * 2 * 10), c(2, 2, 10))
+apply(a, c(1, 2), mean)
+
+rowMeans(a, dims = 2)
+```
+
+## mapply
+
+A multivariate version of apply. Applies a function in parallel over a set of arguments. 
+
+```{r}
+str(mapply)
+
+```
+
+- FUN is a function to apply  
+- ... contains arguments to apply over.  
+- MoreArgs is a list of other arguments to FUN  
+- SIMPLIFY indicates whether the result should be simplified. 
+
+*e.g.* The following is tedious to type 
+
+list(rep(1, 4), rep(2, 3), rep(3, 2), rep(4, 1))
+
+instead we can do
+
+```{r}
+mapply(rep, 1:4, 4:1)
+```
+
+## tapply 
+
+Used to apply a function over subsets of a vector. 
+
+```{r}
+str(tapply)
+```
+
+- X is a vector  
+- INDEX is a factor or a list of factors (if not factors, will be coerced to factors)
+- FUN is a function to be applied  
+- ... contains other arguments to be passed to FUN
+- simplify, same as above
+
+*e.g.* Take group means.
+
+```{r}
+x <- c(rnorm(10), runif(10), rnorm(10, 1))
+f <- gl(3, 10)
+f
+
+tapply(x, f, mean)
+```
+
+In the above example, x is a list of three sets of 10 random numbers are generated. f is an index variable that indicates the first 10 variables belong to group 1, the second 10 belong to group 2, and the third 10 belong to group three. By passing x and f to tapply, the means are calculated using the f index to assign to groups 1, 2, and 3. 
+
+Of particular interest, when working with a data frame, tapply can be passed subsetted column (or row) vectors as the list to be passed to the function and the index list. 
+
+*e.g*
+
+```{r}
+df <- read.csv("D:/Users/derek/OneDrive - The Ottawa Hospital/Projects/01 WntPCP Ciliogenesis Crosstalk EVF/01_DataAnalysis/data/P01_rawdata_ciliatimecourse.csv")
+
+tapply(df$pax7pos_cilianeg, df$time_hours, mean)
+
+```
+
+## split
+
+Takes a vector or other objects and splits it into groups determined by a factor or list of factors
+
+```{r}
+str(split)
+```
+
+x = vector or list or data frame
+f = factor or a list of factors
+drop = indicates whether empty factor levels should be dropped. 
+
+```{r}
+x <- c(rnorm(10), runif(10), rnorm(10,1))
+f <- gl(3, 10)
+split(x, f)
+
+```
+
+*Note*: the *gl* function is super useful for generating a factor list level for subsetting another variable. 
+
+```{r}
+str(gl)
+```
+
+n = number of levels
+k = number of replicates per level
+length = how long the list repeats for
+labels = optional list of labels to apply to the levels. 
+order = define the order of the levels 
+
+split is useful for dividing complicated data frames. 
+
+```{r}
+library(datasets)
+head(airquality)
+```
+
+```{r}
+s <- split(airquality, airquality$Month)
+lapply(s, function(x) {colMeans(x[, c("Ozone", "Solar.R", "Wind")])}
+       )
+```
+
+```{r}
+s <- split(airquality, airquality$Month)
+sapply(s, function(x) {colMeans(x[, c("Ozone", "Solar.R", "Wind")], na.rm = TRUE)}
+       )
+```
+
+**Splitting more than one level**: Sometimes, you might want to split on more than two levels (e.g. gender and treatment). To do so, use the *interaction* function
+
+
+```{r}
+x <- rnorm(10)
+f1 <- gl(2, 5)
+f2 <- gl(5, 2)
+interaction(f1, f2)
+
+```
+
+```{r}
+str(split(x, list(f1, f2)))
+```
+
+```{r}
+str(split(x, list(f1, f2), drop = TRUE))
+```
+
+# Debugging
+
+Several types of "error messages"
+
+- message: a generic notification. The function still continues.  
+- warning: an indication something is wrong but not fatal. i.e. something unexpected happened.  
+- error: An indication that a fatal problem occured; execution stops, produced by the *stop* function
+- condition: a generic concept for indicating that something unexpected occured. All of the above are conditions.  
+
+warning: 
+
+```{r}
+log(-1)
+```
+
+
+```{r}
+printmessage <- function(x) {
+        if(x > 0)
+                print("x is greater than zero")
+        else
+                print("x is less than or equal to zero")
+        invisible(x)
+}
+
+#printmessage(NA)
+```
+
+*note*: invisible allows you to hide the results of a function if you don't want them printing to the console. 
+
+```{r}
+printmessage2 <- function(x) {
+        if(is.na(x))
+                print("x is a missing value!")
+        else if(x > 0)
+                print("x is greater than zero")
+        else
+                print("x is less than or equal to zero")
+        invisible(x)
+}
+
+printmessage2(NA)
+```
+
+Answer these questions if something is wrong:
+
+- What was your input? How did you call the function?  
+- What were you expecting? Output messages, other results?
+- What did you get?  
+- How does what you got differ from what you were expecting?  
+- Were your expectations correct in the first place?  
+- Can you reproduce the problem (exactly)?  
+
+## Debugging tools in R
+
+- *traceback*: prints the function call stack after an error occurs. Tells you how far in you were when the error occurred. 
+- *debug*: flags a function for "debug" mode, which allows you to step through the execution of a function one line at a time. 
+- *browser*: suspends the execution of a function wherever it is called and puts the function in debug mode. Useful if you don't need to debug the whole function, just a section of it.  
+- *trace*: allows you to insert debugging code into a function at specific places. 
+- *recover*: allows you to modify the error behavior so that you can browse the function call stack. 
+
+### Traceback 
+
+Useful for sharring issues with other users. Gives the list of function calls. Must be called immediately after an error. 
+
+```{r}
+mean(x)
+```
+
+```{r}
+traceback(
+)
+```
+
+lm(y - x)
+
+```{r}
+traceback()
+```
+
+### Debug and Browse
+
+*Debug* Creates a separate *browse* environment, which is like a workspace within a workspace. type "n" to move to the next line of code. Continues until you hit the error. 
+
+If you have called debug on multiple functions that are in a call stack, when the Browser reaches the second (third, fourth, etc...) function it will open a browser within a browser (nesting). The current level is indicated in [] brackets next to "Browse" in the command line. 
+
+### Recover
+
+"options(error = recover)" will set R to recover mode until you close the workspace. 
+
+When you hit an error, you will automatically get a traceback of the error. 
+
+Gives you an ordered list of the function call stack from the traceback, that you can navigate through with the console. Useful for large nested functions. 

@@ -1,0 +1,71 @@
+---
+title: "EdEx Notes"
+author: "Derek Hall"
+date: "4/29/2020"
+output: pdf_document
+---
+
+# Indexing Functions
+
+## *which*
+
+*which* gives the entries of a vector that are true. 
+e.g. 
+
+```{r}
+x <- c(F, T, F, T, T, F)
+
+which(x)
+```
+
+This function allows you to create a smaller index object since you only store the index of the variables of interest. 
+
+## *match*
+
+*match* outputs what indices of the second variable that match the entries of the first variable. 
+
+e.g. 
+
+```{r}
+match(c("a", "b", "y", "z"), letters)
+```
+
+## *%in%*
+
+*%in%* allows you to return a logical vector on whether the elements in a first variable are in a second variable. 
+
+```{r}
+
+c("a", "b", 1) %in% letters
+
+```
+
+*%in%* can be combined with *which* to generate an index of the first variable that are present in the second. 
+
+```{r}
+x <- c("a", "b", 1)
+
+ind <- which(x %in% letters)
+
+print(c(ind, x[ind]))
+
+```
+
+# The dplyr package
+
+The dplyr package (part of tidyverse) can be used to intuitively manipulate data tables. 
+
+main functions:
+
+
+- *mutate*: Used to add a new column or change an existing one.   
+- *filter*: Used to subset the data by rows.  
+- *select*: Used to subset the data by columns.  
+- *%>%* (Pipe Operator): Sends the results of one function to another function to perform multiple manipulations in sequence.  
+
+```{r}
+df <- data.frame(names = c("Suzy", "Becky", "Joan"), Apples = c(1, 4, 8), Shifts = c(1, 2, 4))
+
+mutate(df, rate = Apples/Shifts)
+```
+

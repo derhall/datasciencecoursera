@@ -1,0 +1,32 @@
+---
+title: "Subsetting Notes"
+author: "Derek Hall"
+date: "3/25/2020"
+output: html_document
+---
+
+# Which
+
+Useful to select data meeting a criteria
+
+```{r}
+df <- data.frame(c("A", "B", "A", "B"), 1:4)
+colnames(df) <- c("Treatment", "Value")
+  
+  
+df[which(df$Treatment == "A"), ] ## Both of these work
+df[df$Treatment == "A", ] ## The base subset can infer which?
+```
+
+```{r}
+df[, "Treatment"]
+```
+
+
+# Cbind and Rbind
+
+Allow you to bind to matrix or data frames together by columns or rows, respectively. 
+
+# Grep for partial matches
+
+grep("wt", colnames(cplanegenes)) ## searches colnames of cplanegenes matrix to find matches to "wt". Returns a logical vector of matches. 

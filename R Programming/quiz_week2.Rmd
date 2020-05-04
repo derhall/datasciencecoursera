@@ -1,0 +1,107 @@
+---
+title: "quiz_week2"
+author: "Derek Hall"
+date: "3/20/2020"
+output: pdf_document
+---
+
+# Question 1 
+Suppose I define the following function in R
+
+```{r}
+cube <- function(x, n) {
+        x^3 
+}
+```
+
+What is the result of running
+```{r}
+cube(3)
+```
+
+Functions are assessed lazily so the n will be ignored until it is needed. 
+
+# Question 2
+
+The following code will produce a warning in R. Why?
+
+```{r}
+x <- 1:10
+if(x > 5) {
+        x <- 0
+}
+```
+If can only test a single logical value. If the goal is to set all values in the list x that are above 5 to 0, the If statement must be looped for each value in the x vector. This can be acheived with a for loop. 
+
+```{r}
+x <- 1:10
+for(i in x) {
+        if(i > 5) {
+                x[i] <- 0
+        }
+}
+
+x
+```
+
+
+# Question 3
+
+Consider the following function
+```{r}
+f <- function(x) {
+        g <- function(y) {
+                y + z
+        }
+        z <- 4
+        x + g(x)
+}
+```
+
+If I then run in R what value is returned?
+```{r}
+z <- 10
+f(3)
+```
+
+g is defined within function f. Therefore, z will be called from the f fuction environment and set at 4. (x + g(x)) = (3 + g(3)) = (3 + (3+4)) = 10
+
+# Question 4
+
+Consider the following expression. What is the value of 'y' after evaluating this expression? 
+
+```{r}
+x <- 5
+y <- if(x < 3) {
+        NA
+} else {
+        10
+}
+```
+
+5 > 3, therefore y will be 10. 
+
+```{r}
+y
+```
+
+# Question 5
+
+Consider the following R Function
+
+```{r}
+h <- function(x, y = NULL, d = 3L) {
+        z <- cbind(x, d)
+        if(!is.null(y))
+                z <- z + y
+        else
+                z <- z + f
+        g <- x + y / z
+        if(d == 3L)
+                return(g)
+        g <- g + 10
+        g
+}
+```
+
+f is not defined by any function arguments and so is a free variable. 

@@ -1,0 +1,53 @@
+---
+title: "quiz_week3"
+author: "Derek Hall"
+date: "4/1/2020"
+output: pdf_document
+---
+
+# Question 1
+
+In this dataset, what is the mean of 'Sepal.Length' for the species virginica? Please round your answer to the nearest whole number.
+
+```{r}
+library(datasets)
+data(iris)
+?iris
+
+
+tapply(iris$Sepal.Length, iris$Species, mean)
+
+
+```
+
+# Question 2
+
+Continuing with the 'iris' dataset from the previous Question, what R code returns a vector of the means of the variables 'Sepal.Length', 'Sepal.Width', 'Petal.Length', and 'Petal.Width'?
+
+```{r}
+apply(iris[,1:4], 2, mean)
+```
+
+# Question 3
+
+How can one calculate the average miles per gallon (mpg) by number of cylinders in the car (cyl)? Select all that apply.(in the mtcars dataset)
+
+```{r}
+data(mtcars)
+head(mtcars)
+
+tapply(mtcars$mpg, mtcars$cyl, mean)
+with(mtcars, tapply(mpg, cyl, mean))
+sapply(split(mtcars$mpg, mtcars$cyl), mean)
+
+```
+
+# Question 4
+
+Continuing with the 'mtcars' dataset from the previous Question, what is the absolute difference between the average horsepower of 4-cylinder cars and the average horsepower of 8-cylinder cars?
+
+```{r}
+x <- tapply(mtcars$hp, mtcars$cyl, mean)
+abs(x[1] - x[3])
+```
+
